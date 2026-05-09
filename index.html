@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D&D Party – Oversigt</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1a1a2e;
+      color: #e0ddd5;
+      font-family: system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #cecbf6;
+      margin-bottom: 0.5rem;
+    }
+    p.subtitle {
+      text-align: center;
+      color: #afa9ec;
+      margin-bottom: 2.5rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.25rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    a.card {
+      display: block;
+      padding: 1.25rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    a.card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    a.card.spiller {
+      background: #085041;
+      border: 1px solid #5dcaa5;
+      color: #9fe1cb;
+    }
+    a.card.dm {
+      background: #712b13;
+      border: 1px solid #f0997b;
+      color: #f5c4b3;
+    }
+    a.card .label {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    a.card .name {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <h1>D&amp;D Party</h1>
+  <p class="subtitle">Vælg en karakter for at se karakterarket</p>
+  <div class="grid">
+    <a class="card spiller" href="spiller1/karakter1/">
+      <div class="label">Spiller 1</div>
+      <div class="name">Karakter 1</div>
+    </a>
+    <a class="card spiller" href="spiller2/karakter1/">
+      <div class="label">Spiller 2</div>
+      <div class="name">Karakter 1</div>
+    </a>
+    <a class="card spiller" href="spiller3/karakter1/">
+      <div class="label">Spiller 3</div>
+      <div class="name">Karakter 1</div>
+    </a>
+    <a class="card spiller" href="spiller4/karakter1/">
+      <div class="label">Spiller 4</div>
+      <div class="name">Karakter 1</div>
+    </a>
+    <a class="card spiller" href="spiller5/karakter1/">
+      <div class="label">Spiller 5</div>
+      <div class="name">Karakter 1</div>
+    </a>
+    <a class="card dm" href="dm/karakter1/">
+      <div class="label">DM</div>
+      <div class="name">Karakter 1</div>
+    </a>
+  </div>
+</body>
+</html>
