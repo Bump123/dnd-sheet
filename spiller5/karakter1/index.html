@@ -1099,11 +1099,27 @@ populateDropdown('nWepSel',WEAPONS_DB,'name');
 populateDropdown('nWmSel',WEAPONS_DB,'name');
 populateGearDropdown();
 
-render();
-document.getElementById('featuresText').value=C.features||'';
-document.getElementById('langsText').value=C.langs||'';
-document.getElementById('traitsText').value=C.traits||'';
-document.getElementById('equipText').value=C.backstory||'';
+// Auto-load character.json from same folder on startup
+(async()=>{
+  try{
+    const r=await fetch('character.json',{cache:'no-cache'});
+    if(r.ok){
+      const data=await r.json();
+      C={...C,...data,scores:{...C.scores,...(data.scores||{})},coins:{...C.coins,...(data.coins||{})}};
+    }
+  }catch{}
+  render();
+  document.getElementById('charName').value=C.charName||'';
+  document.getElementById('classSelect').value=C.cls||'Bard';
+  document.getElementById('charBg').value=C.charBg||'';
+  document.getElementById('charRace').value=C.charRace||'';
+  document.getElementById('charAlign').value=C.charAlign||'';
+  document.getElementById('featuresText').value=C.features||'';
+  document.getElementById('langsText').value=C.langs||'';
+  document.getElementById('traitsText').value=C.traits||'';
+  document.getElementById('equipText').value=C.backstory||'';
+  if(C.charSub)document.getElementById('charSub').value=C.charSub;
+})();
 </script>
 </body>
 </html>
