@@ -926,16 +926,24 @@ const SKILL_FIELDS={
 async function importPDF(e){
   const file=e.target.files[0];if(!file)return;
   e.target.value='';
-  if(!window.pdfjsLib){alert('PDF.js not loaded yet — try again in a moment.');return;}
-  let pdf;
+  if(!window.pdfjsLib){alert('PDF.js ikke klar endnu — prøv igen om et øjeblik.');return;}
+  let pdf,fields={};
   try{
     const buf=await file.arrayBuffer();
     pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
-  }catch{alert('Could not read PDF.');return;}
-  let fields={};
-  try{fields=await pdf.getFieldObjects();}catch{}
+  }catch(err){
+    console.error('PDF.js load error:',err);
+    alert('Kunne ikke læse PDF.\nFejl: '+err.message);
+    return;
+  }
+  try{fields=await pdf.getFieldObjects()??{};}catch(err){
+    console.error('getFieldObjects error:',err);
+    fields={};
+  }
+  console.log('PDF felter fundet:',Object.keys(fields).length);
+  console.table(Object.entries(fields).map(([k,v])=>({field:k,value:v[0]?.value??''})));
   if(!fields||Object.keys(fields).length===0){
-    alert('No fillable fields found in this PDF.\nOnly AcroForm (fillable) PDFs are supported.\nAll field names will be logged to the console for inspection.');
+    alert('Ingen udfyldbare felter fundet i denne PDF.\nKun AcroForm (fillable) PDFs understøttes.\nSe konsollen (F12) for detaljer.');
     return;
   }
   // Log all fields to console for mapping verification
