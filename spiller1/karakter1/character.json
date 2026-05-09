@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "cls": "Bard",
+  "charSub": "",
+  "scores": { "STR": 8, "DEX": 16, "CON": 14, "INT": 8, "WIS": 10, "CHA": 17 },
+  "ac": 15,
+  "speed": 30,
+  "charName": "Maxwin",
+  "charBg": "Charlatan",
+  "charRace": "Human",
+  "charAlign": "True Neutral"
+}

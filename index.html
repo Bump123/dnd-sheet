@@ -4,95 +4,158 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>D&D Party – Oversigt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #1a1a2e;
-      color: #e0ddd5;
-      font-family: system-ui, sans-serif;
-      min-height: 100vh;
-      padding: 2rem;
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#1a1a2e;
+      --text:#e0ddd5;
+      --spiller-bg:#085041;--spiller-border:#5dcaa5;--spiller-text:#9fe1cb;--spiller-dim:#5dcaa5;
+      --dm-bg:#712b13;--dm-border:#f0997b;--dm-text:#f5c4b3;--dm-dim:#f0997b;
+      --empty-bg:#222228;--empty-border:#444;--empty-text:#666;
     }
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      color: #cecbf6;
-      margin-bottom: 0.5rem;
+    body{
+      background:var(--bg);color:var(--text);
+      font-family:'Crimson Text',serif;
+      min-height:100vh;padding:2.5rem 1.5rem;
     }
-    p.subtitle {
-      text-align: center;
-      color: #afa9ec;
-      margin-bottom: 2.5rem;
+    header{text-align:center;margin-bottom:2.5rem}
+    h1{
+      font-family:'Cinzel',serif;font-size:2rem;font-weight:700;
+      color:#cecbf6;letter-spacing:.12em;margin-bottom:.4rem;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1.25rem;
-      max-width: 900px;
-      margin: 0 auto;
+    header p{font-family:'Cinzel',serif;font-size:.8rem;color:#afa9ec;letter-spacing:.08em}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:1.25rem;max-width:960px;margin:0 auto;
     }
-    a.card {
-      display: block;
-      padding: 1.25rem;
-      border-radius: 10px;
-      text-decoration: none;
-      transition: transform 0.15s, box-shadow 0.15s;
+    .card-dm{grid-column:span 2}
+    @media(max-width:540px){.card-dm{grid-column:span 1}}
+
+    a.card{
+      display:block;padding:1.25rem 1.4rem;border-radius:10px;
+      text-decoration:none;border:1px solid;
+      transition:transform .15s,box-shadow .15s;
+      position:relative;
     }
-    a.card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    a.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+    a.card.spiller{background:var(--spiller-bg);border-color:var(--spiller-border);color:var(--spiller-text)}
+    a.card.dm     {background:var(--dm-bg);    border-color:var(--dm-border);    color:var(--dm-text)}
+    a.card.empty  {background:var(--empty-bg); border-color:var(--empty-border); color:var(--empty-text)}
+
+    .card-owner{
+      font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.12em;
+      text-transform:uppercase;opacity:.65;margin-bottom:.45rem;
     }
-    a.card.spiller {
-      background: #085041;
-      border: 1px solid #5dcaa5;
-      color: #9fe1cb;
+    .card-name{
+      font-family:'Cinzel',serif;font-size:1.3rem;font-weight:700;
+      margin-bottom:.3rem;line-height:1.2;
     }
-    a.card.dm {
-      background: #712b13;
-      border: 1px solid #f0997b;
-      color: #f5c4b3;
+    .card-class{font-size:1rem;margin-bottom:.2rem}
+    .card-sub{font-size:.88rem;opacity:.8;margin-bottom:.4rem;font-style:italic}
+    .card-meta{font-size:.82rem;opacity:.7;margin-bottom:.55rem}
+    .card-stats{
+      display:flex;gap:.6rem;
+      font-family:'Cinzel',serif;font-size:.72rem;
+      border-top:1px solid currentColor;padding-top:.5rem;opacity:.85;
     }
-    a.card .label {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      margin-bottom: 0.25rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .card-stat span{display:block;font-size:.55rem;opacity:.7;text-transform:uppercase;letter-spacing:.06em}
+    .card-empty-msg{font-style:italic;font-size:.9rem;margin-top:.3rem}
+
+    .spinner{
+      width:18px;height:18px;border:2px solid rgba(255,255,255,.15);
+      border-top-color:#afa9ec;border-radius:50%;animation:spin .7s linear infinite;
+      margin:.3rem auto;
     }
-    a.card .name {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-  <h1>D&amp;D Party</h1>
-  <p class="subtitle">Vælg en karakter for at se karakterarket</p>
-  <div class="grid">
-    <a class="card spiller" href="spiller1/karakter1/">
-      <div class="label">Spiller 1</div>
-      <div class="name">Karakter 1</div>
-    </a>
-    <a class="card spiller" href="spiller2/karakter1/">
-      <div class="label">Spiller 2</div>
-      <div class="name">Karakter 1</div>
-    </a>
-    <a class="card spiller" href="spiller3/karakter1/">
-      <div class="label">Spiller 3</div>
-      <div class="name">Karakter 1</div>
-    </a>
-    <a class="card spiller" href="spiller4/karakter1/">
-      <div class="label">Spiller 4</div>
-      <div class="name">Karakter 1</div>
-    </a>
-    <a class="card spiller" href="spiller5/karakter1/">
-      <div class="label">Spiller 5</div>
-      <div class="name">Karakter 1</div>
-    </a>
-    <a class="card dm" href="dm/karakter1/">
-      <div class="label">DM</div>
-      <div class="name">Karakter 1</div>
-    </a>
+  <header>
+    <h1>⚔ D&amp;D Party ⚔</h1>
+    <p>Vælg en karakter for at åbne karakterarket</p>
+  </header>
+  <div id="fileBanner" style="display:none;max-width:960px;margin:0 auto 1.5rem;background:#2a1a00;border:1px solid #c8960c;border-radius:8px;padding:.85rem 1.1rem;font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.05em;color:#c8960c;text-align:center">
+    ⚠ Siden er åbnet via <code style="background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px">file://</code> — fetch virker ikke lokalt.
+    Kør en lokal server: <code style="background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px">npx serve .</code> eller <code style="background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px">python -m http.server</code> i projektmappen.
   </div>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const CHARACTERS = [
+      {label:'Spiller 1', path:'spiller1/karakter1/', type:'spiller'},
+      {label:'Spiller 2', path:'spiller2/karakter1/', type:'spiller'},
+      {label:'Spiller 3', path:'spiller3/karakter1/', type:'spiller'},
+      {label:'Spiller 4', path:'spiller4/karakter1/', type:'spiller'},
+      {label:'Spiller 5', path:'spiller5/karakter1/', type:'spiller'},
+      {label:'DM',        path:'dm/karakter1/',       type:'dm'},
+    ];
+
+    const CLASS_HD = {
+      Barbarian:12,Fighter:10,Paladin:10,Ranger:10,
+      Bard:8,Cleric:8,Druid:8,Monk:8,Rogue:8,Warlock:8,
+      Sorcerer:6,Wizard:6,
+    };
+
+    function calcHP(d) {
+      const hd = CLASS_HD[d.cls] ?? 8;
+      const cm = Math.floor(((d.scores?.CON ?? 10) - 10) / 2);
+      return hd + cm + ((d.level ?? 1) - 1) * (Math.ceil((hd + 1) / 2) + cm);
+    }
+
+    function fillCard(el, ch, data) {
+      el.href = ch.path;
+      el.className = 'card ' + (data ? ch.type : 'empty') + (ch.type === 'dm' ? ' card-dm' : '');
+      if (!data) {
+        el.innerHTML = `
+          <div class="card-owner">${ch.label}</div>
+          <div class="card-name">—</div>
+          <div class="card-empty-msg">Intet ark gemt endnu</div>`;
+      } else {
+        const sub = data.charSub && data.charSub !== '—' && data.charSub !== ''
+          ? `<div class="card-sub">${data.charSub}</div>` : '';
+        const meta = [data.charRace, data.charBg].filter(Boolean).join(' · ');
+        el.innerHTML = `
+          <div class="card-owner">${ch.label}</div>
+          <div class="card-name">${data.charName || '—'}</div>
+          <div class="card-class">Level ${data.level ?? 1} ${data.cls ?? '—'}</div>
+          ${sub}
+          ${meta ? `<div class="card-meta">${meta}</div>` : ''}
+          <div class="card-stats">
+            <div class="card-stat"><span>HP</span>${calcHP(data)}</div>
+            <div class="card-stat"><span>AC</span>${data.ac ?? '—'}</div>
+            <div class="card-stat"><span>Speed</span>${data.speed ?? '—'}</div>
+          </div>`;
+      }
+    }
+
+    async function loadAll() {
+      const grid = document.getElementById('grid');
+      const els = CHARACTERS.map((ch) => {
+        const a = document.createElement('a');
+        a.href = ch.path;
+        a.className = 'card ' + ch.type + (ch.type === 'dm' ? ' card-dm' : '');
+        a.innerHTML = `<div class="card-owner">${ch.label}</div><div class="spinner"></div>`;
+        grid.appendChild(a);
+        return a;
+      });
+
+      await Promise.all(CHARACTERS.map(async (ch, i) => {
+        let data = null;
+        try {
+          const res = await fetch(ch.path + 'character.json', {cache:'no-cache'});
+          if (res.ok) data = await res.json();
+        } catch {}
+        fillCard(els[i], ch, data);
+      }));
+    }
+
+    if (location.protocol === 'file:') {
+      document.getElementById('fileBanner').style.display = 'block';
+    }
+    loadAll();
+  </script>
 </body>
 </html>

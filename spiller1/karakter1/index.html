@@ -103,6 +103,7 @@ body{font-family:'Crimson Text',serif;background:var(--parch);color:var(--ink);p
     <div style="text-align:center;margin-top:.5rem;display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap">
       <button class="save-btn" onclick="saveChar()">💾 Save JSON</button>
       <label class="save-btn" style="cursor:pointer">📂 Load JSON<input type="file" accept=".json" onchange="loadChar(event)" style="display:none"></label>
+      <button class="save-btn" onclick="publishChar()">📌 Publish</button>
     </div>
   </div>
 
@@ -867,6 +868,13 @@ function saveChar(){
   const a=document.createElement('a');
   a.href='data:application/json,'+encodeURIComponent(JSON.stringify(C,null,2));
   a.download=(C.charName||'character').toLowerCase().replace(/\s+/g,'-')+'.json';a.click();
+}
+function publishChar(){
+  collectText();
+  const a=document.createElement('a');
+  a.href='data:application/json,'+encodeURIComponent(JSON.stringify(C,null,2));
+  a.download='character.json';
+  a.click();
 }
 function loadChar(e){
   const file=e.target.files[0];if(!file)return;
