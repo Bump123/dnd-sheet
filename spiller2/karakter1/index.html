@@ -106,6 +106,7 @@ body{font-family:'Crimson Text',serif;background:var(--parch);color:var(--ink);p
       <div class="hf"><label>Alignment</label><input id="charAlign" value="True Neutral"></div>
     </div>
     <div style="text-align:center;margin-top:.5rem;display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap">
+      <a class="save-btn" href="../" style="text-decoration:none">← Tilbage</a>
       <button class="save-btn" onclick="saveChar()">💾 Save JSON</button>
       <label class="save-btn" style="cursor:pointer">📂 Load JSON<input type="file" accept=".json" onchange="loadChar(event)" style="display:none"></label>
       <button class="save-btn" onclick="publishChar()">📌 Publish</button>
