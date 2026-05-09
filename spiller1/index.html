@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spiller 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--acc:#5dcaa5;--acc-bg:#085041;--acc-text:#9fe1cb;--acc-dim:#5dcaa5}
+    body{background:#1a1a2e;color:#e0ddd5;font-family:'Crimson Text',serif;min-height:100vh;padding:2rem 1.5rem}
+    a.back{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.08em;color:var(--acc);text-decoration:none;display:inline-block;margin-bottom:2rem}
+    a.back:hover{text-decoration:underline}
+    h1{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;color:var(--acc-text);letter-spacing:.1em;margin-bottom:2rem}
+    .card{background:var(--acc-bg);border:1px solid var(--acc);border-radius:10px;padding:1.5rem 1.75rem;max-width:480px}
+    .char-name{font-family:'Cinzel',serif;font-size:1.6rem;font-weight:700;color:var(--acc-text);margin-bottom:.25rem}
+    .char-class{font-size:1.05rem;color:var(--acc-text);margin-bottom:.2rem}
+    .char-sub{font-style:italic;font-size:.92rem;color:var(--acc-dim);margin-bottom:.4rem}
+    .char-meta{font-size:.88rem;color:var(--acc-dim);opacity:.8;margin-bottom:1rem}
+    .stats{display:flex;gap:1.25rem;border-top:1px solid var(--acc);padding-top:.9rem;margin-bottom:1.25rem}
+    .stat{font-family:'Cinzel',serif;font-size:.88rem;color:var(--acc-text)}
+    .stat span{display:block;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin-bottom:.15rem}
+    a.open-btn{
+      display:inline-block;font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.1em;
+      color:#1a1a2e;background:var(--acc);border:none;border-radius:6px;
+      padding:.65rem 1.5rem;text-decoration:none;transition:opacity .15s;
+    }
+    a.open-btn:hover{opacity:.85}
+    .empty{font-style:italic;color:var(--acc-dim);opacity:.7;margin-bottom:1rem}
+    .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:1rem 0}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #fileBanner{display:none;background:#2a1a00;border:1px solid #c8960c;border-radius:8px;padding:.8rem 1rem;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.04em;color:#c8960c;margin-bottom:1.5rem;max-width:480px}
+    code{background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px}
+  </style>
+</head>
+<body>
+  <a class="back" href="../">← Oversigt</a>
+  <h1>Spiller 1</h1>
+  <div id="fileBanner">
+    ⚠ Åbnet via <code>file://</code> — fetch virker ikke. Brug <code>npx serve .</code> eller <code>python -m http.server</code> i projektmappen.
+  </div>
+  <div class="card" id="card"><div class="spinner"></div></div>
+
+  <script>
+    const CLASS_HD={Barbarian:12,Fighter:10,Paladin:10,Ranger:10,Bard:8,Cleric:8,Druid:8,Monk:8,Rogue:8,Warlock:8,Sorcerer:6,Wizard:6};
+    function calcHP(d){const hd=CLASS_HD[d.cls]??8;const cm=Math.floor(((d.scores?.CON??10)-10)/2);return hd+cm+((d.level??1)-1)*(Math.ceil((hd+1)/2)+cm);}
+
+    async function load(){
+      if(location.protocol==='file:'){document.getElementById('fileBanner').style.display='block';}
+      let data=null;
+      try{const r=await fetch('karakter1/character.json',{cache:'no-cache'});if(r.ok)data=await r.json();}catch{}
+      const card=document.getElementById('card');
+      if(!data){
+        card.innerHTML=`<div class="empty">Intet ark gemt endnu</div><a class="open-btn" href="karakter1/">Åbn karakterark</a>`;
+      } else {
+        const sub=data.charSub&&data.charSub!=='—'&&data.charSub!==''?`<div class="char-sub">${data.charSub}</div>`:'';
+        const meta=[data.charRace,data.charBg].filter(Boolean).join(' · ');
+        card.innerHTML=`
+          <div class="char-name">${data.charName||'—'}</div>
+          <div class="char-class">Level ${data.level??1} ${data.cls??'—'}</div>
+          ${sub}
+          ${meta?`<div class="char-meta">${meta}</div>`:''}
+          <div class="stats">
+            <div class="stat"><span>HP</span>${calcHP(data)}</div>
+            <div class="stat"><span>AC</span>${data.ac??'—'}</div>
+            <div class="stat"><span>Speed</span>${data.speed??'—'}</div>
+          </div>
+          <a class="open-btn" href="karakter1/">Åbn karakterark</a>`;
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
