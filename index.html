@@ -12,15 +12,16 @@
     h1{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:700;color:#cecbf6;letter-spacing:.12em;margin-bottom:.5rem}
     header p{font-family:'Cinzel',serif;font-size:.78rem;color:#afa9ec;letter-spacing:.1em}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.25rem;max-width:900px;margin:0 auto}
-    a.btn{
+    a.btn, span.btn{
       display:flex;align-items:center;justify-content:center;
-      padding:1.6rem 1rem;border-radius:10px;text-decoration:none;border:1px solid;
+      padding:1.6rem 1rem;border-radius:10px;border:1px solid;
       font-family:'Cinzel',serif;font-size:1.1rem;font-weight:600;letter-spacing:.06em;
-      transition:transform .15s,box-shadow .15s;text-align:center;
+      text-align:center;text-decoration:none;
     }
+    a.btn{transition:transform .15s,box-shadow .15s;cursor:pointer}
     a.btn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.45)}
     a.btn.spiller{background:#085041;border-color:#5dcaa5;color:#9fe1cb}
-    a.btn.dm{background:#712b13;border-color:#f0997b;color:#f5c4b3}
+    span.btn.dm{background:#2a1a1a;border-color:#6b3a2a;color:#6b3a2a;cursor:default;user-select:none}
   </style>
 </head>
 <body>
@@ -34,7 +35,7 @@
     <a class="btn spiller" href="spiller3/">Spiller 3</a>
     <a class="btn spiller" href="spiller4/">Spiller 4</a>
     <a class="btn spiller" href="spiller5/">Spiller 5</a>
-    <a class="btn dm"      href="dm/">DM</a>
+    <span class="btn dm">DM</span>
   </div>
 </body>
 </html>
