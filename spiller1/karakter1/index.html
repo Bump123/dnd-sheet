@@ -946,58 +946,84 @@ async function importPDF(e){
     alert('Ingen udfyldbare felter fundet i denne PDF.\nKun AcroForm (fillable) PDFs understøttes.\nSe konsollen (F12) for detaljer.');
     return;
   }
-  // Log all fields to console for mapping verification
-  console.table(Object.entries(fields).map(([k,v])=>({field:k,value:v[0]?.value??''})));
   const get=(k)=>fields[k]?.[0]?.value??'';
   const getInt=(k)=>parseInt(get(k))||0;
-  // Class + level: "Bard 3" or separate fields
-  const clsRaw=get('ClassLevel').trim();
-  const clsMatch=clsRaw.match(/^(.+?)\s+(\d+)$/);
-  const cls  =clsMatch?clsMatch[1].trim():(get('Class').trim()||C.cls);
-  const level=clsMatch?parseInt(clsMatch[2]):(getInt('Level')||C.level);
-  // Skills
-  const profSkills=[],expSkills=[];
-  for(const[f,skill]of Object.entries(SKILL_FIELDS)){
-    const v=get(f);if(v==='Yes'||v==='true'||v==='On')profSkills.push(skill);
-    const ev=get('Exp'+f.slice(4));if(ev==='Yes'||ev==='true'||ev==='On')expSkills.push(skill);
+
+  // Detect PDF format: WotC official vs custom (generic Text1/Text7/… field names)
+  const isCustom = !get('ClassLevel') && !get('STR') && !!get('Text7');
+
+  let cls,level,charBg,charRace,charAlign,ac,speed,scores,backstory,langs,features,traits,weapons=[],profSkills=[],expSkills=[];
+
+  if(isCustom){
+    // ── Custom PDF mapping (Text-numbered fields) ──────────────────────────
+    cls      = get('Text7').trim() || C.cls;
+    level    = parseInt(get('Text11')) || C.level;
+    charBg   = get('Text6').replace(/\s*\(.*\)/,'').trim() || C.charBg;
+    charRace = get('Text8').trim() || C.charRace;
+    charAlign= get('Text100').trim() || C.charAlign;
+    ac       = parseInt(get('Text13')) || C.ac;
+    speed    = parseInt(get('Text27')) || C.speed;
+    scores   = {
+      STR: parseInt(get('Text63')) || C.scores.STR,
+      DEX: parseInt(get('Text66')) || C.scores.DEX,
+      CON: parseInt(get('Text67')) || C.scores.CON,
+      INT: parseInt(get('Text64')) || C.scores.INT,
+      WIS: parseInt(get('Text65')) || C.scores.WIS,
+      CHA: parseInt(get('Text68')) || C.scores.CHA,
+    };
+    backstory= get('Text97') || C.backstory;
+    langs    = get('Text98') || C.langs;
+    features = [get('Text57'),get('Text58')].filter(Boolean).join('\n\n') || C.features;
+    traits   = get('Text55') || C.traits;
+    // Coins: Text267=SP(5), Text269=GP(200)
+    const coins={
+      pp: parseInt(get('Text271'))||C.coins.pp,
+      gp: parseInt(get('Text269'))||C.coins.gp,
+      ep: parseInt(get('Text268'))||C.coins.ep,
+      sp: parseInt(get('Text267'))||C.coins.sp,
+      cp: parseInt(get('Text270'))||C.coins.cp,
+    };
+    // Skills: not reliably extractable from generic checkboxes — keep existing
+    profSkills = C.profSkills; expSkills = C.expSkills;
+    // Merge
+    C={...C, charName:get('Text1')||C.charName, cls, level, charBg, charRace, charAlign, scores, ac, speed, profSkills, expSkills, features, langs, traits, backstory, coins, weapons:C.weapons};
+  } else {
+    // ── WotC AcroForm standard mapping ────────────────────────────────────
+    const clsRaw=get('ClassLevel').trim();
+    const clsMatch=clsRaw.match(/^(.+?)\s+(\d+)$/);
+    cls  =clsMatch?clsMatch[1].trim():(get('Class').trim()||C.cls);
+    level=clsMatch?parseInt(clsMatch[2]):(getInt('Level')||C.level);
+    for(const[f,skill]of Object.entries(SKILL_FIELDS)){
+      const v=get(f);if(v==='Yes'||v==='true'||v==='On')profSkills.push(skill);
+      const ev=get('Exp'+f.slice(4));if(ev==='Yes'||ev==='true'||ev==='On')expSkills.push(skill);
+    }
+    const traitParts=[get('PersonalityTraits'),get('Ideals'),get('Bonds'),get('Flaws')].filter(Boolean);
+    for(let i=1;i<=3;i++){
+      const n=get(`Wpn${i}_Name`)||get(`Wpn_Name${i}`);
+      if(n)weapons.push({name:n,atk:get(`Wpn${i}_AtkBonus`)||get(`Wpn_AtkBonus${i}`),dmg:get(`Wpn${i}_Damage`)||get(`Wpn_Damage${i}`),type:'',mastery:'—'});
+    }
+    C={
+      ...C,
+      charName: get('CharacterName')||C.charName,
+      cls, level,
+      charBg:   get('Background')||C.charBg,
+      charRace: get('Race')||C.charRace,
+      charSub:  get('Subclass')||C.charSub,
+      charAlign:get('Alignment')||C.charAlign,
+      scores:{
+        STR:getInt('STR')||C.scores.STR, DEX:getInt('DEX')||C.scores.DEX,
+        CON:getInt('CON')||C.scores.CON, INT:getInt('INT')||C.scores.INT,
+        WIS:getInt('WIS')||C.scores.WIS, CHA:getInt('CHA')||C.scores.CHA,
+      },
+      ac:getInt('AC')||C.ac, speed:getInt('Speed')||C.speed,
+      profSkills:profSkills.length?profSkills:C.profSkills,
+      expSkills:expSkills.length?expSkills:C.expSkills,
+      features:get('Features')||C.features, langs:get('ProfsLangs')||C.langs,
+      traits:traitParts.join('\n\n')||C.traits, backstory:get('Backstory')||C.backstory,
+      coins:{pp:getInt('PP')||C.coins.pp,gp:getInt('GP')||C.coins.gp,ep:getInt('EP')||C.coins.ep,sp:getInt('SP')||C.coins.sp,cp:getInt('CP')||C.coins.cp},
+      weapons:weapons.length?weapons:C.weapons,
+    };
   }
-  // Traits block
-  const traitParts=[get('PersonalityTraits'),get('Ideals'),get('Bonds'),get('Flaws')].filter(Boolean);
-  // Weapons
-  const weapons=[];
-  for(let i=1;i<=3;i++){
-    const n=get(`Wpn${i}_Name`)||get(`Wpn_Name${i}`);
-    if(n)weapons.push({name:n,atk:get(`Wpn${i}_AtkBonus`)||get(`Wpn_AtkBonus${i}`),dmg:get(`Wpn${i}_Damage`)||get(`Wpn_Damage${i}`),type:'',mastery:'—'});
-  }
-  // Merge into C — keep existing values where PDF has nothing
-  C={
-    ...C,
-    charName: get('CharacterName')||C.charName,
-    cls, level,
-    charBg:   get('Background')||C.charBg,
-    charRace: get('Race')||C.charRace,
-    charSub:  get('Subclass')||C.charSub,
-    charAlign:get('Alignment')||C.charAlign,
-    scores:{
-      STR:getInt('STR')||C.scores.STR, DEX:getInt('DEX')||C.scores.DEX,
-      CON:getInt('CON')||C.scores.CON, INT:getInt('INT')||C.scores.INT,
-      WIS:getInt('WIS')||C.scores.WIS, CHA:getInt('CHA')||C.scores.CHA,
-    },
-    ac:    getInt('AC')   ||C.ac,
-    speed: getInt('Speed')||C.speed,
-    profSkills: profSkills.length?profSkills:C.profSkills,
-    expSkills:  expSkills.length ?expSkills :C.expSkills,
-    features: get('Features')||C.features,
-    langs:    get('ProfsLangs')||C.langs,
-    traits:   traitParts.join('\n\n')||C.traits,
-    backstory:get('Backstory')||C.backstory,
-    coins:{
-      pp:getInt('PP')||C.coins.pp, gp:getInt('GP')||C.coins.gp,
-      ep:getInt('EP')||C.coins.ep, sp:getInt('SP')||C.coins.sp,
-      cp:getInt('CP')||C.coins.cp,
-    },
-    weapons: weapons.length?weapons:C.weapons,
-  };
   // Sync HTML inputs not managed by render()
   document.getElementById('charName').value   =C.charName;
   document.getElementById('classSelect').value=C.cls;
@@ -1011,7 +1037,7 @@ async function importPDF(e){
   if(C.coins){document.getElementById('coinGP').value=C.coins.gp;document.getElementById('coinSP').value=C.coins.sp;}
   render();
   if(C.charSub)document.getElementById('charSub').value=C.charSub;
-  alert(`Imported from PDF: ${file.name}\nCheck the console (F12) if fields look wrong — field names are logged for debugging.`);
+  alert(`Importeret fra PDF: ${file.name}${isCustom?' (custom PDF-format)':''}\nTjek konsollen (F12) hvis felter ser forkerte ud.`);
 }
 
 // ── MASTER RENDER ─────────────────────────────────────────────────────────
