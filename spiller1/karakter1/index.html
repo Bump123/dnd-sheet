@@ -876,12 +876,50 @@ function saveChar(){
   a.href='data:application/json,'+encodeURIComponent(JSON.stringify(C,null,2));
   a.download=(C.charName||'character').toLowerCase().replace(/\s+/g,'-')+'.json';a.click();
 }
-function publishChar(){
+const GITHUB_REPO='Bump123/dnd-sheet';
+async function publishChar(){
   collectText();
-  const a=document.createElement('a');
-  a.href='data:application/json,'+encodeURIComponent(JSON.stringify(C,null,2));
-  a.download='character.json';
-  a.click();
+  // Detect spiller path from URL: /spiller2/karakter1/ → spiller2/karakter1/character.json
+  const parts=window.location.pathname.replace(/\/$/,'').split('/');
+  const idx=parts.findIndex(p=>/^spiller\d+$/.test(p));
+  if(idx<0){
+    // Not in a spillerX folder — fall back to download
+    const a=document.createElement('a');
+    a.href='data:application/json,'+encodeURIComponent(JSON.stringify(C,null,2));
+    a.download='character.json';a.click();return;
+  }
+  const filePath=parts.slice(idx).join('/')+'/character.json';
+  // Get or prompt for GitHub token
+  let pat=localStorage.getItem('gh_pat');
+  if(!pat){
+    pat=prompt('Indtast GitHub Personal Access Token\n(gemmes i din browser — behøves kun én gang):');
+    if(!pat)return;
+    localStorage.setItem('gh_pat',pat.trim());
+    pat=pat.trim();
+  }
+  const apiUrl=`https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`;
+  // Fetch existing SHA (required by GitHub API for updates)
+  let sha;
+  try{
+    const r=await fetch(apiUrl,{headers:{Authorization:'token '+pat,Accept:'application/vnd.github+json'}});
+    if(r.ok){const d=await r.json();sha=d.sha;}
+  }catch{}
+  // Encode content as base64 (UTF-8 safe)
+  const json=JSON.stringify(C,null,2);
+  const bytes=new TextEncoder().encode(json);
+  let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));
+  const content=btoa(bin);
+  const body={message:`Update ${C.charName||'karakter'} (${C.cls} ${C.level})`,content,...(sha?{sha}:{})};
+  try{
+    const r=await fetch(apiUrl,{method:'PUT',headers:{Authorization:'token '+pat,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
+    if(r.ok){
+      alert(`✓ ${C.charName} gemt!\nNetlify deployer inden for ~1 minut.`);
+    } else {
+      const err=await r.json().catch(()=>({}));
+      if(r.status===401){localStorage.removeItem('gh_pat');alert('Token ugyldigt eller udløbet.\nPrøv igen — du bliver bedt om et nyt token.');}
+      else alert('GitHub fejl '+r.status+': '+(err.message||'ukendt fejl'));
+    }
+  }catch(err){alert('Netværksfejl: '+err.message);}
 }
 function loadChar(e){
   const file=e.target.files[0];if(!file)return;
