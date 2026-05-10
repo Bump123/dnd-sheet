@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>D&D 2024 Character Sheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script type="module">
+import*as p from'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs';
+p.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+window.pdfjsLib=p;
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--parch:#f5f0e8;--parch2:#ede7d3;--ink:#1a1208;--ink2:#3d2e0e;--ink3:#6b4f1c;--red:#8b1a1a;--gold:#c8960c;--border:#7a5c1e;--sec:rgba(90,60,10,0.07)}
@@ -87,9 +92,10 @@ body{font-family:'Crimson Text',serif;background:var(--parch);color:var(--ink);p
       <div class="hf"><label>Character Name</label><input id="charName" value="Maxwin"></div>
       <div class="hf"><label>Class</label>
         <select id="classSelect">
-          <option value="Bard" selected>Bard</option><option value="Barbarian">Barbarian</option>
+          <option value="Artificer">Artificer</option>
+          <option value="Bard">Bard</option><option value="Barbarian">Barbarian</option>
           <option value="Cleric">Cleric</option><option value="Druid">Druid</option>
-          <option value="Fighter">Fighter</option><option value="Monk">Monk</option>
+          <option value="Fighter" selected>Fighter</option><option value="Monk">Monk</option>
           <option value="Paladin">Paladin</option><option value="Ranger">Ranger</option>
           <option value="Rogue">Rogue</option><option value="Sorcerer">Sorcerer</option>
           <option value="Warlock">Warlock</option><option value="Wizard">Wizard</option>
@@ -97,12 +103,15 @@ body{font-family:'Crimson Text',serif;background:var(--parch);color:var(--ink);p
       </div>
       <div class="hf"><label>Background</label><input id="charBg" value="Charlatan"></div>
       <div class="hf"><label>Species</label><input id="charRace" value="Human"></div>
-      <div class="hf"><label>Subclass</label><select id="charSub" style="width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:'Crimson Text',serif;font-size:1rem;color:var(--ink);padding:2px 4px;outline:none"></select></div>
+      <div class="hf"><label id="subclassLabel">Subclass</label><select id="charSub" style="width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:'Crimson Text',serif;font-size:1rem;color:var(--ink);padding:2px 4px;outline:none"></select></div>
       <div class="hf"><label>Alignment</label><input id="charAlign" value="True Neutral"></div>
     </div>
     <div style="text-align:center;margin-top:.5rem;display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap">
+      <a class="save-btn" href="../" style="text-decoration:none">← Tilbage</a>
       <button class="save-btn" onclick="saveChar()">💾 Save JSON</button>
       <label class="save-btn" style="cursor:pointer">📂 Load JSON<input type="file" accept=".json" onchange="loadChar(event)" style="display:none"></label>
+      <button class="save-btn" onclick="publishChar()">📌 Publish</button>
+      <label class="save-btn" style="cursor:pointer">📄 Import PDF<input type="file" accept=".pdf" onchange="importPDF(event)" style="display:none"></label>
     </div>
   </div>
 
@@ -357,9 +366,11 @@ const CLASS_DATA={
   Rogue:{hd:8,sa:null,ps:['DEX','INT'],slots:[],feat:{1:"Expertise\nSneak Attack (1d6)\nThieves' Cant\nWeapon Mastery",2:'Cunning Action',3:'Subclass\nSteady Aim',4:'ASI',5:'Uncanny Dodge\nSneak Attack (3d6)',6:'Expertise x2',7:'Evasion',8:'ASI',9:'Sneak Attack (5d6)',10:'Subclass Feature'}},
   Sorcerer:{hd:6,sa:'CHA',ps:['CON','CHA'],slots:[[],[2],[3],[4,2],[4,3],[4,3,2],[4,3,3],[4,3,3,1],[4,3,3,2],[4,3,3,3,1],[4,3,3,3,2]],feat:{1:'Spellcasting\nInnate Sorcery\nSubclass',2:'Font of Magic\nMetamagic',3:'—',4:'ASI',5:'—',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Metamagic'}},
   Warlock:{hd:8,sa:'CHA',ps:['WIS','CHA'],slots:[[],[1],[2],[2],[2],[2],[2],[2],[2],[2],[2]],feat:{1:'Eldritch Invocations\nPact Magic\nSubclass',2:'Eldritch Invocations (2)',3:'Pact Boon',4:'ASI',5:'Eldritch Invocations upgrade',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Subclass Feature'}},
-  Wizard:{hd:6,sa:'INT',ps:['INT','WIS'],slots:[[],[2],[3],[4,2],[4,3],[4,3,2],[4,3,3],[4,3,3,1],[4,3,3,2],[4,3,3,3,1],[4,3,3,3,2]],feat:{1:'Spellcasting\nArcane Recovery',2:'Subclass',3:'—',4:'ASI',5:'—',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Subclass Feature'}}
+  Wizard:{hd:6,sa:'INT',ps:['INT','WIS'],slots:[[],[2],[3],[4,2],[4,3],[4,3,2],[4,3,3],[4,3,3,1],[4,3,3,2],[4,3,3,3,1],[4,3,3,3,2]],feat:{1:'Spellcasting\nArcane Recovery',2:'Subclass',3:'—',4:'ASI',5:'—',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Subclass Feature'}},
+  Artificer:{hd:8,sa:'INT',ps:['CON','INT'],slots:[[],[2],[2],[3],[3],[4,2],[4,2],[4,3],[4,3],[4,3,2],[4,3,2]],feat:{1:'Magical Tinkering\nSpellcasting\nRight Tool for the Job',2:'Infuse Item (2 infusions)',3:'Artificer Specialist\nThe Right Tool for the Job',4:'ASI',5:'Specialist Feature\nExtra Attack',6:'Tool Expertise',7:'Flash of Genius',8:'ASI',9:'Specialist Feature',10:'Magic Item Adept'}},
 };
 const CLASS_SUBCLASSES={
+  Artificer:{level:3,note:'Ikke i PHB — kræver Eberron: Forge of the Artificer',subclasses:['Alchemist','Armorer','Artillerist','Battle Smith','Cartographer']},
   Barbarian:{level:3,subclasses:['Path of the Berserker','Path of the Wild Heart','Path of the World Tree','Path of the Zealot']},
   Bard:     {level:3,subclasses:['College of Dance','College of Glamour','College of Lore','College of Valor']},
   Cleric:   {level:1,subclasses:['Life Domain','Light Domain','Trickery Domain','War Domain']},
@@ -527,44 +538,17 @@ const GEAR_DB=[
 
 // ── CHARACTER STATE ────────────────────────────────────────────────────────
 let C={
-  level:2, cls:'Bard',
-  scores:{STR:8,DEX:16,CON:14,INT:8,WIS:10,CHA:17},
-  profSkills:['Deception','Insight','Perception','Performance','Persuasion','Sleight of Hand'],
-  expSkills:['Perception','Persuasion'],
-  ac:15, speed:30, inspiration:false, bardInspUsed:0,
-  weaponMastery:[],
-  weapons:[
-    {name:'Vicious Mockery',atk:'Wis 13',dmg:'1d6 Psychic',mastery:'—'},
-    {name:'Healing Words',atk:'+3',dmg:'2d4+3',mastery:'—'},
-  ],
-  spells:[
-    {lvl:'1',name:'Dissonant Whispers',cast:'A',range:'60'},
-    {lvl:'1',name:'Healing Words',cast:'B',range:'60'},
-    {lvl:'1',name:'Sleep',cast:'A',range:'60'},
-    {lvl:'1',name:'Faerie Fire',cast:'A',range:'60'},
-    {lvl:'C',name:'Vicious Mockery',cast:'A',range:'60'},
-    {lvl:'C',name:'Mage Hand',cast:'A(1)',range:'30'},
-  ],
+  level:1, cls:'Fighter', charSub:'',
+  scores:{STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10},
+  profSkills:[], expSkills:[],
+  ac:10, speed:30, inspiration:false, bardInspUsed:0,
+  weaponMastery:[], weapons:[], spells:[],
   usedSlots:{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
-  deathS:0, deathF:0,
-  maxWeight:80,
-  coins:{pp:0,gp:200,ep:0,sp:5,cp:0},
-  gear:[
-    {name:'Studded Leather Armor',w:13,cost:'45 GP',qty:1},
-    {name:'Component Pouch',w:2,cost:'25 GP',qty:1},
-    {name:"Clothes, Traveler's",w:4,cost:'2 GP',qty:1},
-    {name:'Waterskin',w:5,cost:'2 SP',qty:1},
-    {name:'Backpack',w:5,cost:'2 GP',qty:1},
-    {name:'Rations (1 day)',w:2,cost:'5 SP',qty:3},
-    {name:'Flute',w:1,cost:'2 GP',qty:1},
-    {name:'Forgery Kit',w:5,cost:'15 GP',qty:1},
-    {name:'Clothes, Fine',w:6,cost:'15 GP',qty:1},
-    {name:'Costume',w:4,cost:'5 GP',qty:1},
-  ],
-  features:'Bardic Inspiration (d6): Bonus Action — inspire ally within 60ft. Lasts 1 hour. Used after a failed d20 test.\n\nJack of All Trades: Add half proficiency to non-proficient skill checks.\n\nExpertise: Double proficiency on Perception and Persuasion.',
-  charName:'Maxwin', charBg:'Charlatan', charRace:'Human', charSub:'—', charAlign:'True Neutral',
-  langs:'Common, Common Sign Language, Dwarvish\n\nTools: Forgery Kit, Flute',
-  traits:'Resourceful: Gain Heroic Inspiration on Long Rest.\nSkillful: Proficiency in one skill.\n\nFeats: Skilled, Musician, Instrument Training (3 instruments), Encouraging Song.',
+  deathS:0, deathF:0, maxWeight:80,
+  coins:{pp:0,gp:0,ep:0,sp:0,cp:0},
+  gear:[],
+  features:'', charName:'', charBg:'', charRace:'', charAlign:'',
+  langs:'', traits:'', backstory:'',
 };
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
@@ -798,9 +782,16 @@ function addGear(){
 function renderSubclassDropdown(){
   const sel=document.getElementById('charSub');if(!sel)return;
   const cs=CLASS_SUBCLASSES[C.cls];
+  const lbl=document.getElementById('subclassLabel');
   const cur=C.charSub||'';
   sel.innerHTML='';
-  if(!cs){const o=document.createElement('option');o.value='—';o.textContent='—';sel.appendChild(o);return;}
+  if(!cs){
+    if(lbl)lbl.textContent='Subclass';
+    sel.title='';
+    const o=document.createElement('option');o.value='—';o.textContent='—';sel.appendChild(o);return;
+  }
+  if(lbl)lbl.textContent=cs.label||'Subclass';
+  sel.title=cs.note||'';
   const none=document.createElement('option');
   none.value='';none.textContent=C.level<cs.level?`— Vælges ved level ${cs.level} —`:'— Ingen —';
   none.selected=!cur;sel.appendChild(none);
@@ -868,6 +859,51 @@ function saveChar(){
   a.href='data:application/json,'+encodeURIComponent(JSON.stringify(C,null,2));
   a.download=(C.charName||'character').toLowerCase().replace(/\s+/g,'-')+'.json';a.click();
 }
+const GITHUB_REPO='Bump123/dnd-sheet';
+async function publishChar(){
+  collectText();
+  // Detect spiller path from URL: /spiller2/karakter1/ → spiller2/karakter1/character.json
+  const parts=window.location.pathname.replace(/\/$/,'').split('/');
+  const idx=parts.findIndex(p=>/^spiller\d+$/.test(p));
+  if(idx<0){
+    // Not in a spillerX folder — fall back to download
+    const a=document.createElement('a');
+    a.href='data:application/json,'+encodeURIComponent(JSON.stringify(C,null,2));
+    a.download='character.json';a.click();return;
+  }
+  const filePath=parts.slice(idx).join('/')+'/character.json';
+  // Get or prompt for GitHub token
+  let pat=localStorage.getItem('gh_pat');
+  if(!pat){
+    pat=prompt('Indtast GitHub Personal Access Token\n(gemmes i din browser — behøves kun én gang):');
+    if(!pat)return;
+    localStorage.setItem('gh_pat',pat.trim());
+    pat=pat.trim();
+  }
+  const apiUrl=`https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`;
+  // Fetch existing SHA (required by GitHub API for updates)
+  let sha;
+  try{
+    const r=await fetch(apiUrl,{headers:{Authorization:'token '+pat,Accept:'application/vnd.github+json'}});
+    if(r.ok){const d=await r.json();sha=d.sha;}
+  }catch{}
+  // Encode content as base64 (UTF-8 safe)
+  const json=JSON.stringify(C,null,2);
+  const bytes=new TextEncoder().encode(json);
+  let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));
+  const content=btoa(bin);
+  const body={message:`Update ${C.charName||'karakter'} (${C.cls} ${C.level})`,content,...(sha?{sha}:{})};
+  try{
+    const r=await fetch(apiUrl,{method:'PUT',headers:{Authorization:'token '+pat,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
+    if(r.ok){
+      alert(`✓ ${C.charName} gemt!\nNetlify deployer inden for ~1 minut.`);
+    } else {
+      const err=await r.json().catch(()=>({}));
+      if(r.status===401){localStorage.removeItem('gh_pat');alert('Token ugyldigt eller udløbet.\nPrøv igen — du bliver bedt om et nyt token.');}
+      else alert('GitHub fejl '+r.status+': '+(err.message||'ukendt fejl'));
+    }
+  }catch(err){alert('Netværksfejl: '+err.message);}
+}
 function loadChar(e){
   const file=e.target.files[0];if(!file)return;
   const r=new FileReader();
@@ -899,6 +935,153 @@ function resetChar(){
   render();
 }
 
+// ── PDF IMPORT ────────────────────────────────────────────────────────────
+const SKILL_FIELDS={
+  'ProfAcrobatics':'Acrobatics','ProfAnimalHandl':'Animal Handling',
+  'ProfArcana':'Arcana','ProfAthletics':'Athletics','ProfDeception':'Deception',
+  'ProfHistory':'History','ProfInsight':'Insight','ProfIntimidation':'Intimidation',
+  'ProfInvestigation':'Investigation','ProfMedicine':'Medicine','ProfNature':'Nature',
+  'ProfPerception':'Perception','ProfPerformance':'Performance','ProfPersuasion':'Persuasion',
+  'ProfReligion':'Religion','ProfSleightOfHand':'Sleight of Hand',
+  'ProfStealth':'Stealth','ProfSurvival':'Survival',
+};
+async function importPDF(e){
+  const file=e.target.files[0];if(!file)return;
+  e.target.value='';
+  if(!window.pdfjsLib){alert('PDF.js ikke klar endnu — prøv igen om et øjeblik.');return;}
+  let pdf,fields={};
+  try{
+    const buf=await file.arrayBuffer();
+    pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
+  }catch(err){
+    console.error('PDF.js load error:',err);
+    alert('Kunne ikke læse PDF.\nFejl: '+err.message);
+    return;
+  }
+  try{fields=await pdf.getFieldObjects()??{};}catch(err){
+    console.error('getFieldObjects error:',err);
+    fields={};
+  }
+  console.log('PDF felter fundet:',Object.keys(fields).length);
+  console.table(Object.entries(fields).map(([k,v])=>({field:k,value:v[0]?.value??''})));
+  if(!fields||Object.keys(fields).length===0){
+    alert('Ingen udfyldbare felter fundet i denne PDF.\nKun AcroForm (fillable) PDFs understøttes.\nSe konsollen (F12) for detaljer.');
+    return;
+  }
+  const get=(k)=>fields[k]?.[0]?.value??'';
+  const getInt=(k)=>parseInt(get(k))||0;
+
+  // Full reset before import so empty PDF fields show as blank, not as the previous character's data
+  C.charName=''; C.charBg=''; C.charRace=''; C.charSub=''; C.charAlign='';
+  C.cls='Fighter'; C.level=1;
+  C.scores={STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10};
+  C.ac=10; C.speed=30;
+  C.features=''; C.langs=''; C.traits=''; C.backstory='';
+  C.profSkills=[]; C.expSkills=[];
+  C.weapons=[]; C.spells=[]; C.gear=[]; C.weaponMastery=[];
+  C.coins={pp:0,gp:0,ep:0,sp:0,cp:0};
+  C.usedSlots={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+  C.inspiration=false; C.bardInspUsed=0; C.deathS=0; C.deathF=0; C.maxWeight=80;
+
+  // Detect PDF format: WotC official vs custom (generic Text1/Text7/… field names)
+  const isCustom = !get('ClassLevel') && !get('STR') && !!get('Text7');
+
+  let cls,level,charBg,charRace,charAlign,ac,speed,scores,backstory,langs,features,traits,weapons=[],profSkills=[],expSkills=[];
+
+  if(isCustom){
+    // ── Custom PDF mapping (Text-numbered fields) ──────────────────────────
+    cls      = get('Text7').trim() || C.cls;
+    level    = parseInt(get('Text11')) || C.level;
+    charBg   = get('Text6').replace(/\s*\(.*\)/,'').trim() || C.charBg;
+    charRace = get('Text8').trim() || C.charRace;
+    charAlign= get('Text100').trim() || C.charAlign;
+    ac       = parseInt(get('Text13')) || C.ac;
+    speed    = parseInt(get('Text27')) || C.speed;
+    scores   = {
+      STR: parseInt(get('Text63')) || C.scores.STR,
+      DEX: parseInt(get('Text66')) || C.scores.DEX,
+      CON: parseInt(get('Text67')) || C.scores.CON,
+      INT: parseInt(get('Text64')) || C.scores.INT,
+      WIS: parseInt(get('Text65')) || C.scores.WIS,
+      CHA: parseInt(get('Text68')) || C.scores.CHA,
+    };
+    backstory= get('Text97') || C.backstory;
+    langs    = get('Text98') || C.langs;
+    features = [get('Text57'),get('Text58')].filter(Boolean).join('\n\n') || C.features;
+    traits   = get('Text55') || C.traits;
+    // Coins: Text267=SP(5), Text269=GP(200)
+    const coins={
+      pp: parseInt(get('Text271'))||C.coins.pp,
+      gp: parseInt(get('Text269'))||C.coins.gp,
+      ep: parseInt(get('Text268'))||C.coins.ep,
+      sp: parseInt(get('Text267'))||C.coins.sp,
+      cp: parseInt(get('Text270'))||C.coins.cp,
+    };
+    // Skills: not reliably extractable from generic checkboxes — keep existing
+    profSkills = C.profSkills; expSkills = C.expSkills;
+    // Merge
+    C={...C, charName:get('Text1')||C.charName, cls, level, charBg, charRace, charAlign, scores, ac, speed, profSkills, expSkills, features, langs, traits, backstory, coins, weapons:C.weapons};
+  } else {
+    // ── WotC AcroForm standard mapping ────────────────────────────────────
+    const clsRaw=get('ClassLevel').trim();
+    const clsMatch=clsRaw.match(/^(.+?)\s+(\d+)$/);
+    cls  =clsMatch?clsMatch[1].trim():(get('Class').trim()||C.cls);
+    level=clsMatch?parseInt(clsMatch[2]):(getInt('Level')||C.level);
+    for(const[f,skill]of Object.entries(SKILL_FIELDS)){
+      const v=get(f);if(v==='Yes'||v==='true'||v==='On')profSkills.push(skill);
+      const ev=get('Exp'+f.slice(4));if(ev==='Yes'||ev==='true'||ev==='On')expSkills.push(skill);
+    }
+    const traitParts=[get('PersonalityTraits'),get('Ideals'),get('Bonds'),get('Flaws')].filter(Boolean);
+    for(let i=1;i<=3;i++){
+      const n=get(`Wpn${i}_Name`)||get(`Wpn_Name${i}`);
+      if(n)weapons.push({name:n,atk:get(`Wpn${i}_AtkBonus`)||get(`Wpn_AtkBonus${i}`),dmg:get(`Wpn${i}_Damage`)||get(`Wpn_Damage${i}`),type:'',mastery:'—'});
+    }
+    const gear=get('Equipment').split('\n').map(s=>s.trim()).filter(Boolean).map(item=>{
+      const lo=item.toLowerCase();
+      const db=GEAR_DB.find(g=>g.name.toLowerCase()===lo)
+             ||GEAR_DB.find(g=>lo.startsWith(g.name.toLowerCase()))
+             ||GEAR_DB.find(g=>g.name.toLowerCase().startsWith(lo));
+      return db?{name:db.name,w:db.w,cost:db.cost,qty:1}:{name:item,w:0,cost:'?',qty:1};
+    });
+    C={
+      ...C,
+      charName: get('CharacterName')||C.charName,
+      cls, level,
+      charBg:   get('Background')||C.charBg,
+      charRace: get('Race')||C.charRace,
+      charSub:  get('Subclass')||C.charSub,
+      charAlign:get('Alignment')||C.charAlign,
+      scores:{
+        STR:getInt('STR')||C.scores.STR, DEX:getInt('DEX')||C.scores.DEX,
+        CON:getInt('CON')||C.scores.CON, INT:getInt('INT')||C.scores.INT,
+        WIS:getInt('WIS')||C.scores.WIS, CHA:getInt('CHA')||C.scores.CHA,
+      },
+      ac:getInt('AC')||C.ac, speed:getInt('Speed')||C.speed,
+      profSkills:profSkills.length?profSkills:C.profSkills,
+      expSkills:expSkills.length?expSkills:C.expSkills,
+      features:get('Features')||C.features, langs:get('ProfsLangs')||C.langs,
+      traits:traitParts.join('\n\n')||C.traits, backstory:get('Backstory')||C.backstory,
+      coins:{pp:getInt('PP')||C.coins.pp,gp:getInt('GP')||C.coins.gp,ep:getInt('EP')||C.coins.ep,sp:getInt('SP')||C.coins.sp,cp:getInt('CP')||C.coins.cp},
+      weapons:weapons.length?weapons:C.weapons,
+      gear,
+    };
+  }
+  // Sync HTML inputs not managed by render()
+  document.getElementById('charName').value   =C.charName;
+  document.getElementById('classSelect').value=C.cls;
+  document.getElementById('charBg').value     =C.charBg;
+  document.getElementById('charRace').value   =C.charRace;
+  document.getElementById('charAlign').value  =C.charAlign;
+  document.getElementById('featuresText').value=C.features;
+  document.getElementById('langsText').value   =C.langs;
+  document.getElementById('traitsText').value  =C.traits;
+  document.getElementById('equipText').value   =C.backstory;
+  if(C.coins){document.getElementById('coinGP').value=C.coins.gp;document.getElementById('coinSP').value=C.coins.sp;}
+  render();
+  if(C.charSub)document.getElementById('charSub').value=C.charSub;
+  alert(`Importeret fra PDF: ${file.name}${isCustom?' (custom PDF-format)':''}\nTjek konsollen (F12) hvis felter ser forkerte ud.`);
+}
+
 // ── MASTER RENDER ─────────────────────────────────────────────────────────
 function render(){
   renderStats();renderSaves();renderSkills();renderCombat();
@@ -919,11 +1102,27 @@ populateDropdown('nWepSel',WEAPONS_DB,'name');
 populateDropdown('nWmSel',WEAPONS_DB,'name');
 populateGearDropdown();
 
-render();
-document.getElementById('featuresText').value=C.features||'';
-document.getElementById('langsText').value=C.langs||'';
-document.getElementById('traitsText').value=C.traits||'';
-document.getElementById('equipText').value=C.backstory||'';
+// Auto-load character.json from same folder on startup
+(async()=>{
+  try{
+    const r=await fetch('character.json',{cache:'no-cache'});
+    if(r.ok){
+      const data=await r.json();
+      C={...C,...data,scores:{...C.scores,...(data.scores||{})},coins:{...C.coins,...(data.coins||{})}};
+    }
+  }catch{}
+  render();
+  document.getElementById('charName').value=C.charName||'';
+  document.getElementById('classSelect').value=C.cls||'Bard';
+  document.getElementById('charBg').value=C.charBg||'';
+  document.getElementById('charRace').value=C.charRace||'';
+  document.getElementById('charAlign').value=C.charAlign||'';
+  document.getElementById('featuresText').value=C.features||'';
+  document.getElementById('langsText').value=C.langs||'';
+  document.getElementById('traitsText').value=C.traits||'';
+  document.getElementById('equipText').value=C.backstory||'';
+  if(C.charSub)document.getElementById('charSub').value=C.charSub;
+})();
 </script>
 </body>
 </html>
