@@ -988,10 +988,17 @@ async function importPDF(e){
   const get=(k)=>fields[k]?.[0]?.value??'';
   const getInt=(k)=>parseInt(get(k))||0;
 
-  // Reset fields that can't be reliably mapped from PDF, so we don't carry over default character data
+  // Full reset before import so empty PDF fields show as blank, not as the previous character's data
+  C.charName=''; C.charBg=''; C.charRace=''; C.charSub=''; C.charAlign='';
+  C.cls='Fighter'; C.level=1;
+  C.scores={STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10};
+  C.ac=10; C.speed=30;
+  C.features=''; C.langs=''; C.traits=''; C.backstory='';
+  C.profSkills=[]; C.expSkills=[];
   C.weapons=[]; C.spells=[]; C.gear=[]; C.weaponMastery=[];
   C.coins={pp:0,gp:0,ep:0,sp:0,cp:0};
   C.usedSlots={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+  C.inspiration=false; C.bardInspUsed=0; C.deathS=0; C.deathF=0; C.maxWeight=80;
 
   // Detect PDF format: WotC official vs custom (generic Text1/Text7/… field names)
   const isCustom = !get('ClassLevel') && !get('STR') && !!get('Text7');
