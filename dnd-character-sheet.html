@@ -1026,6 +1026,13 @@ async function importPDF(e){
       const n=get(`Wpn${i}_Name`)||get(`Wpn_Name${i}`);
       if(n)weapons.push({name:n,atk:get(`Wpn${i}_AtkBonus`)||get(`Wpn_AtkBonus${i}`),dmg:get(`Wpn${i}_Damage`)||get(`Wpn_Damage${i}`),type:'',mastery:'—'});
     }
+    const gear=get('Equipment').split('\n').map(s=>s.trim()).filter(Boolean).map(item=>{
+      const lo=item.toLowerCase();
+      const db=GEAR_DB.find(g=>g.name.toLowerCase()===lo)
+             ||GEAR_DB.find(g=>lo.startsWith(g.name.toLowerCase()))
+             ||GEAR_DB.find(g=>g.name.toLowerCase().startsWith(lo));
+      return db?{name:db.name,w:db.w,cost:db.cost,qty:1}:{name:item,w:0,cost:'?',qty:1};
+    });
     C={
       ...C,
       charName: get('CharacterName')||C.charName,
@@ -1046,6 +1053,7 @@ async function importPDF(e){
       traits:traitParts.join('\n\n')||C.traits, backstory:get('Backstory')||C.backstory,
       coins:{pp:getInt('PP')||C.coins.pp,gp:getInt('GP')||C.coins.gp,ep:getInt('EP')||C.coins.ep,sp:getInt('SP')||C.coins.sp,cp:getInt('CP')||C.coins.cp},
       weapons:weapons.length?weapons:C.weapons,
+      gear,
     };
   }
   // Sync HTML inputs not managed by render()
