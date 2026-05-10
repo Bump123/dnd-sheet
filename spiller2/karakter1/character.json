@@ -1,6 +1,7 @@
 {
   "level": 2,
   "cls": "Artificer",
+  "charSub": "",
   "scores": {
     "STR": 8,
     "DEX": 16,
@@ -26,7 +27,44 @@
   "bardInspUsed": 0,
   "weaponMastery": [],
   "weapons": [],
-  "spells": [],
+  "spells": [
+    {
+      "lvl": "C",
+      "name": "Ray of Frost",
+      "cast": "Action",
+      "range": "60"
+    },
+    {
+      "lvl": "C",
+      "name": "Guidance",
+      "cast": "Action",
+      "range": "Touch"
+    },
+    {
+      "lvl": "C",
+      "name": "Mending",
+      "cast": "1 Min",
+      "range": "Touch"
+    },
+    {
+      "lvl": "1",
+      "name": "Cure Wounds",
+      "cast": "Action",
+      "range": "Touch"
+    },
+    {
+      "lvl": "1",
+      "name": "Grease",
+      "cast": "Action",
+      "range": "60"
+    },
+    {
+      "lvl": "1",
+      "name": "Sanctuary",
+      "cast": "BA",
+      "range": "30"
+    }
+  ],
   "usedSlots": {
     "1": 0,
     "2": 0,
@@ -48,12 +86,36 @@
     "sp": 0,
     "cp": 0
   },
-  "gear": [],
-  "features": "",
+  "gear": [
+    {
+      "name": "Shield",
+      "w": 6,
+      "cost": "10 GP",
+      "qty": 1
+    },
+    {
+      "name": "Healer's Kit",
+      "w": 3,
+      "cost": "5 GP",
+      "qty": 1
+    },
+    {
+      "name": "Thieves' Tools",
+      "w": 1,
+      "cost": "25 GP",
+      "qty": 1
+    },
+    {
+      "name": "Rations (1 day)",
+      "w": 2,
+      "cost": "5 SP",
+      "qty": 8
+    }
+  ],
+  "features": "Tinker's Magic\n\nReplicate Magic Item:\nBag of Holding\nGoggles of Night\nRope of Climbing\nWand of the War Mage +1",
   "charName": "Arthur",
   "charBg": "Criminal",
   "charRace": "Human",
-  "charSub": "",
   "charAlign": "Neutral Good",
   "langs": "Common, Dwarvish, Gnomish",
   "traits": "Resourceful:\ngain Heroic Inspiration whenever you finish a Long Rest\n\nAlert:\nInitiative Swap\n\nSkilled",
