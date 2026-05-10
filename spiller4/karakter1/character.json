@@ -1,173 +1,30 @@
 {
-  "level": 2,
-  "cls": "Monk",
-  "scores": {
-    "STR": 2,
-    "DEX": 17,
-    "CON": 14,
-    "INT": 8,
-    "WIS": 16,
-    "CHA": 8
-  },
-  "profSkills": [
-    "Deception",
-    "Insight",
-    "Perception",
-    "Performance",
-    "Persuasion",
-    "Sleight of Hand"
-  ],
-  "expSkills": [
-    "Perception",
-    "Persuasion"
-  ],
-  "ac": 16,
-  "speed": 40,
+  "level": 1,
+  "cls": "Fighter",
+  "charSub": "",
+  "scores": { "STR": 10, "DEX": 10, "CON": 10, "INT": 10, "WIS": 10, "CHA": 10 },
+  "profSkills": [],
+  "expSkills": [],
+  "ac": 10,
+  "speed": 30,
   "inspiration": false,
   "bardInspUsed": 0,
   "weaponMastery": [],
-  "weapons": [
-    {
-      "name": "Vicious Mockery",
-      "atk": "Wis 13",
-      "dmg": "1d6 Psychic",
-      "mastery": "—"
-    },
-    {
-      "name": "Healing Words",
-      "atk": "+3",
-      "dmg": "2d4+3",
-      "mastery": "—"
-    }
-  ],
-  "spells": [
-    {
-      "lvl": "1",
-      "name": "Dissonant Whispers",
-      "cast": "A",
-      "range": "60"
-    },
-    {
-      "lvl": "1",
-      "name": "Healing Words",
-      "cast": "B",
-      "range": "60"
-    },
-    {
-      "lvl": "1",
-      "name": "Sleep",
-      "cast": "A",
-      "range": "60"
-    },
-    {
-      "lvl": "1",
-      "name": "Faerie Fire",
-      "cast": "A",
-      "range": "60"
-    },
-    {
-      "lvl": "C",
-      "name": "Vicious Mockery",
-      "cast": "A",
-      "range": "60"
-    },
-    {
-      "lvl": "C",
-      "name": "Mage Hand",
-      "cast": "A(1)",
-      "range": "30"
-    }
-  ],
-  "usedSlots": {
-    "1": 0,
-    "2": 0,
-    "3": 0,
-    "4": 0,
-    "5": 0,
-    "6": 0,
-    "7": 0,
-    "8": 0,
-    "9": 0
-  },
+  "weapons": [],
+  "spells": [],
+  "usedSlots": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0 },
   "deathS": 0,
   "deathF": 0,
   "maxWeight": 80,
-  "coins": {
-    "pp": 0,
-    "gp": 56,
-    "ep": 0,
-    "sp": 5,
-    "cp": 0
-  },
-  "gear": [
-    {
-      "name": "Studded Leather Armor",
-      "w": 13,
-      "cost": "45 GP",
-      "qty": 1
-    },
-    {
-      "name": "Component Pouch",
-      "w": 2,
-      "cost": "25 GP",
-      "qty": 1
-    },
-    {
-      "name": "Clothes, Traveler's",
-      "w": 4,
-      "cost": "2 GP",
-      "qty": 1
-    },
-    {
-      "name": "Waterskin",
-      "w": 5,
-      "cost": "2 SP",
-      "qty": 1
-    },
-    {
-      "name": "Backpack",
-      "w": 5,
-      "cost": "2 GP",
-      "qty": 1
-    },
-    {
-      "name": "Rations (1 day)",
-      "w": 2,
-      "cost": "5 SP",
-      "qty": 3
-    },
-    {
-      "name": "Flute",
-      "w": 1,
-      "cost": "2 GP",
-      "qty": 1
-    },
-    {
-      "name": "Forgery Kit",
-      "w": 5,
-      "cost": "15 GP",
-      "qty": 1
-    },
-    {
-      "name": "Clothes, Fine",
-      "w": 6,
-      "cost": "15 GP",
-      "qty": 1
-    },
-    {
-      "name": "Costume",
-      "w": 4,
-      "cost": "5 GP",
-      "qty": 1
-    }
-  ],
-  "features": "You gain Heroic Inspiration whenever you finish a Long Rest.\n\nSkilled:\n\nAlert: When you roll Initiative, you can add your Proficiency Bonus to the roll.\n\nImmediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can't make this swap if you or the ally has the Incapacitated condition.",
-  "charName": "Maxwin",
-  "charBg": "Scribe",
-  "charRace": "Human",
+  "coins": { "pp": 0, "gp": 0, "ep": 0, "sp": 0, "cp": 0 },
+  "gear": [],
+  "features": "",
+  "charName": "",
+  "charBg": "",
+  "charRace": "",
   "charSub": "",
-  "charAlign": "True Neutral",
-  "langs": "Common, Common Sign Language, Dwarvish\n\nTools: Forgery Kit, Flute",
-  "traits": "Flurry of Blows. You can expend 1 Focus Point to make two Unarmed Strikes as a Bonus Action.\n\nPatient Defense. You can take the Disengage action as a Bonus Action. Alternatively, you can expend 1 Focus Point to take both the Disengage and the Dodge actions as a Bonus Action.\n\nStep of the Wind. You can take the Dash action as a Bonus Action. Alternatively, you can expend 1 Focus Point to take both the Disengage and Dash actions as a Bonus Action, and your jump distance is doubled for the turn.\n\n",
-  "backstory": "Travelled far around, met a lot of people that has taught me many things.\nA bit racist, but hides it well within my speeches of wisdom\n\nPatron: Threestrings\nFrequently has a \"lute off\""
+  "charAlign": "",
+  "langs": "",
+  "traits": "",
+  "backstory": ""
 }
