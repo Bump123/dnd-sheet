@@ -92,9 +92,10 @@ body{font-family:'Crimson Text',serif;background:var(--parch);color:var(--ink);p
       <div class="hf"><label>Character Name</label><input id="charName" value="Maxwin"></div>
       <div class="hf"><label>Class</label>
         <select id="classSelect">
-          <option value="Bard" selected>Bard</option><option value="Barbarian">Barbarian</option>
+          <option value="Artificer">Artificer</option>
+          <option value="Bard">Bard</option><option value="Barbarian">Barbarian</option>
           <option value="Cleric">Cleric</option><option value="Druid">Druid</option>
-          <option value="Fighter">Fighter</option><option value="Monk">Monk</option>
+          <option value="Fighter" selected>Fighter</option><option value="Monk">Monk</option>
           <option value="Paladin">Paladin</option><option value="Ranger">Ranger</option>
           <option value="Rogue">Rogue</option><option value="Sorcerer">Sorcerer</option>
           <option value="Warlock">Warlock</option><option value="Wizard">Wizard</option>
@@ -102,7 +103,7 @@ body{font-family:'Crimson Text',serif;background:var(--parch);color:var(--ink);p
       </div>
       <div class="hf"><label>Background</label><input id="charBg" value="Charlatan"></div>
       <div class="hf"><label>Species</label><input id="charRace" value="Human"></div>
-      <div class="hf"><label>Subclass</label><select id="charSub" style="width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:'Crimson Text',serif;font-size:1rem;color:var(--ink);padding:2px 4px;outline:none"></select></div>
+      <div class="hf"><label id="subclassLabel">Subclass</label><select id="charSub" style="width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:'Crimson Text',serif;font-size:1rem;color:var(--ink);padding:2px 4px;outline:none"></select></div>
       <div class="hf"><label>Alignment</label><input id="charAlign" value="True Neutral"></div>
     </div>
     <div style="text-align:center;margin-top:.5rem;display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap">
@@ -365,9 +366,11 @@ const CLASS_DATA={
   Rogue:{hd:8,sa:null,ps:['DEX','INT'],slots:[],feat:{1:"Expertise\nSneak Attack (1d6)\nThieves' Cant\nWeapon Mastery",2:'Cunning Action',3:'Subclass\nSteady Aim',4:'ASI',5:'Uncanny Dodge\nSneak Attack (3d6)',6:'Expertise x2',7:'Evasion',8:'ASI',9:'Sneak Attack (5d6)',10:'Subclass Feature'}},
   Sorcerer:{hd:6,sa:'CHA',ps:['CON','CHA'],slots:[[],[2],[3],[4,2],[4,3],[4,3,2],[4,3,3],[4,3,3,1],[4,3,3,2],[4,3,3,3,1],[4,3,3,3,2]],feat:{1:'Spellcasting\nInnate Sorcery\nSubclass',2:'Font of Magic\nMetamagic',3:'—',4:'ASI',5:'—',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Metamagic'}},
   Warlock:{hd:8,sa:'CHA',ps:['WIS','CHA'],slots:[[],[1],[2],[2],[2],[2],[2],[2],[2],[2],[2]],feat:{1:'Eldritch Invocations\nPact Magic\nSubclass',2:'Eldritch Invocations (2)',3:'Pact Boon',4:'ASI',5:'Eldritch Invocations upgrade',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Subclass Feature'}},
-  Wizard:{hd:6,sa:'INT',ps:['INT','WIS'],slots:[[],[2],[3],[4,2],[4,3],[4,3,2],[4,3,3],[4,3,3,1],[4,3,3,2],[4,3,3,3,1],[4,3,3,3,2]],feat:{1:'Spellcasting\nArcane Recovery',2:'Subclass',3:'—',4:'ASI',5:'—',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Subclass Feature'}}
+  Wizard:{hd:6,sa:'INT',ps:['INT','WIS'],slots:[[],[2],[3],[4,2],[4,3],[4,3,2],[4,3,3],[4,3,3,1],[4,3,3,2],[4,3,3,3,1],[4,3,3,3,2]],feat:{1:'Spellcasting\nArcane Recovery',2:'Subclass',3:'—',4:'ASI',5:'—',6:'Subclass Feature',7:'—',8:'ASI',9:'—',10:'Subclass Feature'}},
+  Artificer:{hd:8,sa:'INT',ps:['CON','INT'],slots:[[],[2],[2],[3],[3],[4,2],[4,2],[4,3],[4,3],[4,3,2],[4,3,2]],feat:{1:'Magical Tinkering\nSpellcasting\nRight Tool for the Job',2:'Infuse Item (2 infusions)',3:'Artificer Specialist\nThe Right Tool for the Job',4:'ASI',5:'Specialist Feature\nExtra Attack',6:'Tool Expertise',7:'Flash of Genius',8:'ASI',9:'Specialist Feature',10:'Magic Item Adept'}},
 };
 const CLASS_SUBCLASSES={
+  Artificer:{level:3,label:'Specialist',note:'Ikke i PHB — kræver Eberron: Forge of the Artificer',subclasses:['Alchemist','Armorer','Artillerist','Battle Smith','Cartographer']},
   Barbarian:{level:3,subclasses:['Path of the Berserker','Path of the Wild Heart','Path of the World Tree','Path of the Zealot']},
   Bard:     {level:3,subclasses:['College of Dance','College of Glamour','College of Lore','College of Valor']},
   Cleric:   {level:1,subclasses:['Life Domain','Light Domain','Trickery Domain','War Domain']},
@@ -779,9 +782,16 @@ function addGear(){
 function renderSubclassDropdown(){
   const sel=document.getElementById('charSub');if(!sel)return;
   const cs=CLASS_SUBCLASSES[C.cls];
+  const lbl=document.getElementById('subclassLabel');
   const cur=C.charSub||'';
   sel.innerHTML='';
-  if(!cs){const o=document.createElement('option');o.value='—';o.textContent='—';sel.appendChild(o);return;}
+  if(!cs){
+    if(lbl)lbl.textContent='Subclass';
+    sel.title='';
+    const o=document.createElement('option');o.value='—';o.textContent='—';sel.appendChild(o);return;
+  }
+  if(lbl)lbl.textContent=cs.label||'Subclass';
+  sel.title=cs.note||'';
   const none=document.createElement('option');
   none.value='';none.textContent=C.level<cs.level?`— Vælges ved level ${cs.level} —`:'— Ingen —';
   none.selected=!cur;sel.appendChild(none);
